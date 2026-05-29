@@ -33,6 +33,20 @@ export async function authStatus(ctx: Context) {
 }
 
 /**
+ * Whether the "change default credentials" prompt is suppressed.
+ *
+ * Useful when hermes-web-ui is bundled inside a single-user desktop install
+ * (e.g. the Electron wrapper) where the default account is an implementation
+ * detail and the prompt would only confuse end users.
+ *
+ * Set HERMES_WEB_UI_DISABLE_CREDENTIAL_PROMPT=true (or 1, on, yes) to disable.
+ */
+function isCredentialChangePromptDisabled(): boolean {
+  const raw = (process.env.HERMES_WEB_UI_DISABLE_CREDENTIAL_PROMPT || '').trim().toLowerCase()
+  return raw === 'true' || raw === '1' || raw === 'on' || raw === 'yes'
+}
+
+/**
  * GET /api/auth/me
  * Return the authenticated account.
  */
@@ -53,7 +67,9 @@ export async function currentUser(ctx: Context) {
       created_at: user.created_at,
       updated_at: user.updated_at,
       last_login_at: user.last_login_at,
-      requiresCredentialChange: user.username === DEFAULT_USERNAME && verifyPassword(DEFAULT_PASSWORD, user.password_hash),
+      requiresCredentialChange: isCredentialChangePromptDisabled()
+        ? false
+        : user.username === DEFAULT_USERNAME && verifyPassword(DEFAULT_PASSWORD, user.password_hash),
     },
   }
 }

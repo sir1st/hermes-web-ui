@@ -32,6 +32,9 @@
   "bin": {
     "hermes-web-ui": "./bin/hermes-web-ui.mjs"
   },
+  "workspaces": [
+    "packages/desktop"
+  ],
   "scripts": {
     "start": "vite --host --port 8648",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",

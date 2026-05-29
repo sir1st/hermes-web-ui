@@ -1,0 +1,13 @@
+# Python runtime (CI artifact)
+resources/python/
+
+# Build output
+dist/
+release/
+
+# Node
+node_modules/
+
+# Data
+*.db
+.token

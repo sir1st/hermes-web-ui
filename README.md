@@ -220,6 +220,26 @@ Open **http://localhost:6060**
 
 For detailed notes and troubleshooting, see [`docs/docker.md`](./docs/docker.md).
 
+### Desktop App
+
+A cross-platform desktop build of Hermes Web UI is available as a single,
+self-contained installer. The desktop app bundles an embedded Python runtime
+and the `hermes-agent` package, so end users do not need to install Node.js,
+Python, or `hermes-agent` separately — install, launch, and the Web UI opens
+in a native window.
+
+Supported platforms:
+
+- macOS — Apple Silicon (`arm64`) and Intel (`x64`)
+- Windows — `x64`
+- Linux — `x64` and `arm64` (AppImage / deb)
+
+Download installers from the [GitHub Releases page](https://github.com/EKKOLearnAI/hermes-web-ui/releases)
+*(populated once the desktop release workflow publishes its first build).*
+
+For desktop development, packaging, and the embedded Python runtime layout,
+see [`packages/desktop/README.md`](./packages/desktop/README.md).
+
 ### Hermes Agent Runtime Discovery
 
 When Web UI starts backend chat features, it prefers a source checkout that
