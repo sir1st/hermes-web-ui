@@ -98,10 +98,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 24
+      - name: Setup Node.js 23
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '23'
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
@@ -111,7 +111,8 @@ jobs:
           python-version: '3.12'
 
       - name: Install root dependencies
-        run: npm ci --no-audit --no-fund --ignore-scripts
+        shell: bash
+        run: npm ci --no-audit --no-fund --ignore-scripts || npm ci --no-audit --no-fund --ignore-scripts
 
       - name: Rebuild native addons
         run: npm rebuild
