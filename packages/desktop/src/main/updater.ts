@@ -1,4 +1,6 @@
 import { app, dialog } from 'electron'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { autoUpdater } from 'electron-updater'
 
 let initialized = false
@@ -8,6 +10,10 @@ export function initAutoUpdater() {
   initialized = true
 
   if (!app.isPackaged) return // dev mode: skip
+
+  // electron-builder only generates app-update.yml for distributable targets
+  // (dmg, nsis, etc.), not for --dir builds. Skip updater if the file is missing.
+  if (!existsSync(join(process.resourcesPath, 'app-update.yml'))) return
 
   autoUpdater.autoDownload = true
   autoUpdater.autoInstallOnAppQuit = true

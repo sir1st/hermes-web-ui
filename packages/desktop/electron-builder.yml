@@ -2,6 +2,12 @@ appId: com.hermesagent.desktop
 productName: Hermes Desktop
 copyright: Copyright © 2026
 
+# In an npm workspaces setup the `electron` devDependency gets hoisted to
+# the repo-root node_modules, so electron-builder can't introspect it from
+# this package's own node_modules. Pin the version explicitly to short-
+# circuit that lookup (see electron-userland/electron-builder#3984).
+electronVersion: 42.3.0
+
 directories:
   output: release
   buildResources: build
