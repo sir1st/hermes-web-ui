@@ -9,11 +9,22 @@ import { app } from 'electron'
 import { webuiServerEntry, webuiDir, hermesBin, webUiHome, hermesHome, tokenFile, pythonDir } from './paths'
 
 const DEFAULT_PORT = 8748
-const READY_TIMEOUT_MS = 30_000
+const DEFAULT_READY_TIMEOUT_MS = 30_000
 const execFileAsync = promisify(execFile)
 
 let serverProc: ChildProcess | null = null
 let cachedToken: string | null = null
+
+function envPositiveInt(name: string): number | undefined {
+  const raw = process.env[name]
+  if (!raw) return undefined
+  const value = Number(raw)
+  return Number.isFinite(value) && value > 0 ? value : undefined
+}
+
+function readyTimeoutMs(): number {
+  return envPositiveInt('HERMES_DESKTOP_READY_TIMEOUT_MS') || DEFAULT_READY_TIMEOUT_MS
+}
 
 function ensureToken(): string {
   if (cachedToken) return cachedToken
@@ -272,7 +283,7 @@ export async function startWebUiServer(port = DEFAULT_PORT): Promise<string> {
     }
   })
 
-  await waitForReady(port, READY_TIMEOUT_MS)
+  await waitForReady(port, readyTimeoutMs())
   return getServerUrl(port)
 }
 
