@@ -27,17 +27,16 @@
  *   - 停止时先尝试 `hermes gateway stop`，再根据 PID / 监听端口清理进程
  */
 
-import { spawn, type ChildProcess } from 'child_process'
+import type { ChildProcess } from 'child_process'
 import { join } from 'path'
 import { readFileSync, existsSync, readdirSync, unlinkSync } from 'fs'
-import { execFile } from 'child_process'
-import { promisify } from 'util'
 import { createServer } from 'net'
 import yaml from 'js-yaml'
 import { logger } from '../logger'
 import { detectHermesHome, getHermesBin } from './hermes-path'
+import { execHermesFile, spawnHermesFile } from './hermes-process'
 
-const execFileAsync = promisify(execFile)
+const execFileAsync = execHermesFile
 
 // ============================
 // 常量 & 环境检测
@@ -573,7 +572,7 @@ export class GatewayManager {
     return new Promise((resolve, reject) => {
       const env = buildGatewayProcessEnv(name, hermesHome)
       const detachGateway = shouldDetachGatewayProcess()
-      const child = spawn(HERMES_BIN, ['gateway', 'run', '--replace'], {
+      const child = spawnHermesFile(HERMES_BIN, ['gateway', 'run', '--replace'], {
         stdio: 'ignore',
         detached: detachGateway,
         windowsHide: true,

@@ -1,9 +1,8 @@
-import { execFile, spawn } from 'child_process'
 import type { ChildProcess } from 'child_process'
-import { promisify } from 'util'
 import { logger } from '../logger'
+import { execHermesFile, spawnHermesFile } from './hermes-process'
 
-const execFileAsync = promisify(execFile)
+const execFileAsync = execHermesFile
 
 const execOpts = { windowsHide: true }
 const BOARD_SLUG_RE = /^[a-z0-9][a-z0-9_-]{0,63}$/
@@ -318,7 +317,7 @@ export function buildWatchArgs(opts?: KanbanWatchOptions): string[] {
 }
 
 export function watchEvents(opts?: KanbanWatchOptions): ChildProcess {
-  return spawn(HERMES_BIN, buildWatchArgs(opts), {
+  return spawnHermesFile(HERMES_BIN, buildWatchArgs(opts), {
     stdio: ['ignore', 'pipe', 'pipe'],
     ...execOpts,
   })

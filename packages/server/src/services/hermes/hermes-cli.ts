@@ -1,7 +1,5 @@
-import { execFile, spawn } from 'child_process'
 import { existsSync, readFileSync, unlinkSync } from 'fs'
 import { join } from 'path'
-import { promisify } from 'util'
 import YAML from 'js-yaml'
 import { logger } from '../logger'
 import { stripLegacyApiServerGatewayConfig, updateConfigYaml } from '../config-helpers'
@@ -9,8 +7,9 @@ import { getActiveProfileDir, getActiveProfileName, getProfileDir, listProfileNa
 import { startGatewayRunManaged } from './gateway-runner'
 import { isGatewayRunningForProfile } from './gateway-autostart'
 import { parseProfileListRuntimeInfo, type ProfileListRuntimeInfo } from './profile-list-parser'
+import { execHermesFile, spawnHermesFile } from './hermes-process'
 
-const execFileAsync = promisify(execFile)
+const execFileAsync = execHermesFile
 
 const execOpts = { windowsHide: true }
 const isDocker = existsSync('/.dockerenv')
@@ -445,7 +444,7 @@ export async function startGateway(): Promise<string> {
  * Uses "hermes gateway run" as a detached background process
  */
 export async function startGatewayBackground(): Promise<number | null> {
-  const child = spawn(HERMES_BIN, ['gateway', 'run'], {
+  const child = spawnHermesFile(HERMES_BIN, ['gateway', 'run'], {
     detached: true,
     stdio: 'ignore',
     windowsHide: true,

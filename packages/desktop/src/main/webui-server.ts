@@ -7,7 +7,8 @@ import { app } from 'electron'
 import { webuiServerEntry, webuiDir, hermesBin, webUiHome, hermesHome, tokenFile, pythonDir } from './paths'
 
 const DEFAULT_PORT = 8748
-const READY_TIMEOUT_MS = 30_000
+const READY_TIMEOUT_MS = 150_000
+const OUTPUT_TAIL_LIMIT = 12_000
 
 let serverProc: ChildProcess | null = null
 let cachedToken: string | null = null
@@ -153,16 +154,27 @@ export async function startWebUiServer(port = DEFAULT_PORT): Promise<string> {
     PATH: [dirname(hermesBin()), process.env.PATH].filter(Boolean).join(delimiter),
   }
 
+  let outputTail = ''
+  const appendOutput = (chunk: Buffer): string => {
+    const text = chunk.toString('utf8')
+    outputTail = (outputTail + text).slice(-OUTPUT_TAIL_LIMIT)
+    return text
+  }
+  const withOutputTail = (message: string): Error => {
+    const tail = outputTail.trim()
+    return new Error(tail ? `${message}\n\nLast server output:\n${tail}` : message)
+  }
+
   serverProc = spawn(process.execPath, [entry], {
     env,
     stdio: ['ignore', 'pipe', 'pipe'],
   })
 
   serverProc.stdout?.on('data', (chunk: Buffer) => {
-    process.stdout.write(`[webui] ${chunk}`)
+    process.stdout.write(`[webui] ${appendOutput(chunk)}`)
   })
   serverProc.stderr?.on('data', (chunk: Buffer) => {
-    process.stderr.write(`[webui] ${chunk}`)
+    process.stderr.write(`[webui] ${appendOutput(chunk)}`)
   })
   serverProc.on('exit', (code, signal) => {
     console.error(`[webui] server exited code=${code} signal=${signal}`)
@@ -172,13 +184,25 @@ export async function startWebUiServer(port = DEFAULT_PORT): Promise<string> {
     }
   })
 
-  await waitForReady(port, READY_TIMEOUT_MS)
+  const exitedBeforeReady = new Promise<never>((_, reject) => {
+    serverProc?.once('error', reject)
+    serverProc?.once('exit', (code, signal) => {
+      reject(withOutputTail(`Web UI server exited before ready code=${code} signal=${signal}`))
+    })
+  })
+
+  try {
+    await Promise.race([waitForReady(port, READY_TIMEOUT_MS), exitedBeforeReady])
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw withOutputTail(message)
+  }
   return getServerUrl(port)
 }
 
 async function waitForReady(port: number, timeoutMs: number): Promise<void> {
   const deadline = Date.now() + timeoutMs
-  const url = `http://127.0.0.1:${port}/api/health`
+  const url = `http://127.0.0.1:${port}/health`
   while (Date.now() < deadline) {
     try {
       const res = await fetch(url, { signal: AbortSignal.timeout(1000) })

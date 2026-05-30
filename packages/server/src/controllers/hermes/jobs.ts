@@ -1,12 +1,11 @@
 import type { Context } from 'koa'
-import { execFile } from 'child_process'
 import { existsSync, readFileSync } from 'fs'
 import { join } from 'path'
-import { promisify } from 'util'
 import { getHermesBin } from '../../services/hermes/hermes-path'
 import { getActiveProfileName, getProfileDir } from '../../services/hermes/hermes-profile'
+import { execHermesFile } from '../../services/hermes/hermes-process'
 
-const execFileAsync = promisify(execFile)
+const execFileAsync = execHermesFile
 const TIMEOUT_MS = 60_000
 
 type JobRecord = Record<string, any>
