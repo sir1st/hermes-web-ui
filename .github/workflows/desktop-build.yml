@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feat/desktop-integration
     paths:
       - 'packages/desktop/**'
       - '.github/workflows/desktop-build.yml'
