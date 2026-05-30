@@ -111,10 +111,10 @@ jobs:
           python-version: '3.12'
 
       - name: Install root dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund --ignore-scripts
 
-      - name: Rebuild node-pty
-        run: npm rebuild node-pty
+      - name: Rebuild native addons
+        run: npm rebuild
 
       - name: Build hermes-web-ui (client + server)
         run: npm run build
