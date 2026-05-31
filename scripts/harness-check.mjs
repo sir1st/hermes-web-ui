@@ -118,8 +118,12 @@ if (!buildWorkflow.includes('npm run harness:check')) {
 
 const desktopReleaseWorkflow = await readText('.github/workflows/desktop-release.yml')
 const electronBuilderConfig = await readText('packages/desktop/electron-builder.yml')
-if (!desktopReleaseWorkflow.includes('files: ${{ matrix.artifact_files }}')) {
-  fail('desktop-release.yml must upload matrix-specific artifact_files')
+if (!desktopReleaseWorkflow.includes('files: ${{ matrix.release_files }}')) {
+  fail('desktop-release.yml must upload matrix-specific release_files')
+}
+
+if (!desktopReleaseWorkflow.includes('files: packages/desktop/release/latest-mac.yml')) {
+  fail('desktop-release.yml must upload the merged macOS updater manifest')
 }
 
 if (!electronBuilderConfig.includes('icon: build/icons')) {

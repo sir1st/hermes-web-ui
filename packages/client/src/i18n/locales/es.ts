@@ -105,6 +105,20 @@ export default {
     expired: 'Expirado',
   },
 
+  desktop: {
+    settings: 'Ajustes de escritorio',
+    launchAtLogin: 'Iniciar al acceder',
+    closeToBackground: 'Cerrar en segundo plano',
+    autoUpdates: 'Actualizaciones automaticas',
+    checkForUpdates: 'Buscar actualizaciones',
+    quit: 'Salir',
+    settingsSaved: 'Ajuste de escritorio guardado',
+    settingsLoadFailed: 'No se pudieron cargar los ajustes de escritorio',
+    settingsSaveFailed: 'No se pudo guardar el ajuste de escritorio',
+    updateCheckStarted: 'Buscando actualizaciones',
+    updateCheckFailed: 'No se pudieron buscar actualizaciones',
+  },
+
   // Gestion de MCP
   mcp: {
     title: 'Servidores MCP',

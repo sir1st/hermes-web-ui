@@ -105,6 +105,20 @@ export default {
     expired: 'Expirado',
   },
 
+  desktop: {
+    settings: 'Configuracoes do desktop',
+    launchAtLogin: 'Iniciar ao entrar',
+    closeToBackground: 'Fechar para segundo plano',
+    autoUpdates: 'Atualizacoes automaticas',
+    checkForUpdates: 'Verificar atualizacoes',
+    quit: 'Sair',
+    settingsSaved: 'Configuracao do desktop salva',
+    settingsLoadFailed: 'Falha ao carregar configuracoes do desktop',
+    settingsSaveFailed: 'Falha ao salvar configuracao do desktop',
+    updateCheckStarted: 'Verificando atualizacoes',
+    updateCheckFailed: 'Falha ao verificar atualizacoes',
+  },
+
   // Gestao de MCP
   mcp: {
     title: 'Servidores MCP',

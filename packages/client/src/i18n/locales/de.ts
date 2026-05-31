@@ -105,6 +105,20 @@ export default {
     expired: 'Abgelaufen',
   },
 
+  desktop: {
+    settings: 'Desktop-Einstellungen',
+    launchAtLogin: 'Beim Anmelden starten',
+    closeToBackground: 'In den Hintergrund schliessen',
+    autoUpdates: 'Automatische Updates',
+    checkForUpdates: 'Nach Updates suchen',
+    quit: 'Beenden',
+    settingsSaved: 'Desktop-Einstellung gespeichert',
+    settingsLoadFailed: 'Desktop-Einstellungen konnten nicht geladen werden',
+    settingsSaveFailed: 'Desktop-Einstellung konnte nicht gespeichert werden',
+    updateCheckStarted: 'Suche nach Updates',
+    updateCheckFailed: 'Update-Suche fehlgeschlagen',
+  },
+
   // MCP-Verwaltung
   mcp: {
     title: 'MCP-Server',

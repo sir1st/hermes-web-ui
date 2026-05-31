@@ -22,6 +22,16 @@ Hermes installs:
 The desktop wrapper's own Web UI state is stored separately in
 `~/.hermes-web-ui` unless `HERMES_WEB_UI_HOME` is set.
 
+Desktop settings such as launch at login, close-to-background, and automatic
+updates are stored in `desktop-settings.json` under the Web UI state directory.
+
+## Bundled CLI
+
+The desktop app keeps its bundled Hermes CLI separate from the user's own
+`hermes` command. In desktop-launched terminals and subprocesses, the bundled
+CLI is exposed as `hermes-studio`; existing user-installed `hermes` or
+`hermes-cli` commands remain resolved from the user's normal shell PATH.
+
 ## China mirror environment
 
 These mirrors are optional and are not required in CI:

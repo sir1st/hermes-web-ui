@@ -2,13 +2,25 @@ import { app, dialog } from 'electron'
 import { autoUpdater } from 'electron-updater'
 
 let initialized = false
+let enabled = false
+let timer: ReturnType<typeof setInterval> | null = null
+let installDownloadedUpdate: (() => Promise<void>) | null = null
 
-export function initAutoUpdater() {
-  if (initialized) return
-  initialized = true
+export interface AutoUpdaterOptions {
+  enabled: boolean
+  onBeforeInstall?: () => Promise<void>
+}
+
+export function initAutoUpdater(options: AutoUpdaterOptions) {
+  enabled = options.enabled
+  installDownloadedUpdate = options.onBeforeInstall || null
+  if (initialized) {
+    configureAutoUpdater(enabled)
+    return
+  }
 
   if (!app.isPackaged) return // dev mode: skip
-  if (process.env.HERMES_DESKTOP_ENABLE_AUTO_UPDATE !== 'true') return
+  initialized = true
 
   autoUpdater.autoDownload = true
   autoUpdater.autoInstallOnAppQuit = true
@@ -32,15 +44,41 @@ export function initAutoUpdater() {
       defaultId: 0,
       cancelId: 1,
     })
-    if (response === 0) autoUpdater.quitAndInstall()
+    if (response === 0) {
+      await installDownloadedUpdate?.().catch(() => undefined)
+      autoUpdater.quitAndInstall()
+    }
   })
 
-  autoUpdater.checkForUpdates().catch(err => {
+  configureAutoUpdater(enabled)
+}
+
+export function configureAutoUpdater(nextEnabled: boolean) {
+  enabled = nextEnabled
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+  if (!app.isPackaged || !initialized || !enabled) return
+
+  checkForDesktopUpdates().catch(err => {
     console.error('[updater] initial check failed:', err)
   })
 
   // Recheck every 6h while app is running
-  setInterval(() => {
+  timer = setInterval(() => {
     autoUpdater.checkForUpdates().catch(() => undefined)
   }, 6 * 60 * 60 * 1000)
+}
+
+export async function checkForDesktopUpdates(options: { force?: boolean } = {}) {
+  if (!app.isPackaged) {
+    console.log('[updater] skipped update check in dev mode')
+    return null
+  }
+  if (!enabled && !options.force) {
+    console.log('[updater] skipped update check while disabled')
+    return null
+  }
+  return autoUpdater.checkForUpdates()
 }

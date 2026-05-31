@@ -105,6 +105,20 @@ export default {
     stop: '停止',
   },
 
+  desktop: {
+    settings: '桌面設定',
+    launchAtLogin: '開機啟動',
+    closeToBackground: '關閉到背景',
+    autoUpdates: '自動更新',
+    checkForUpdates: '檢查更新',
+    quit: '結束',
+    settingsSaved: '桌面設定已儲存',
+    settingsLoadFailed: '載入桌面設定失敗',
+    settingsSaveFailed: '儲存桌面設定失敗',
+    updateCheckStarted: '正在檢查更新',
+    updateCheckFailed: '檢查更新失敗',
+  },
+
   // 側邊欄
   // MCP 管理
   mcp: {

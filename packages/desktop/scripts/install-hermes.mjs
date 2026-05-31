@@ -115,6 +115,15 @@ if (TARGET_OS === 'win32') {
       '"%PY%" -m hermes_cli.main %*',
     ].join('\r\n'),
   )
+  const studioCmdPath = resolve(PY_DIR, 'Scripts', 'hermes-studio.cmd')
+  writeFileSync(
+    studioCmdPath,
+    [
+      '@echo off',
+      'set "PY=%~dp0..\\python.exe"',
+      '"%PY%" -m hermes_cli.main %*',
+    ].join('\r\n'),
+  )
 } else {
   const launcher = [
     '#!/bin/sh',
@@ -124,6 +133,9 @@ if (TARGET_OS === 'win32') {
   ].join('\n')
   writeFileSync(hermesBin, launcher, { mode: 0o755 })
   chmodSync(hermesBin, 0o755)
+  const studioBin = resolve(PY_DIR, 'bin', 'hermes-studio')
+  writeFileSync(studioBin, launcher, { mode: 0o755 })
+  chmodSync(studioBin, 0o755)
   // Same for hermes-agent / hermes-acp (they all just dispatch into modules)
   for (const [name, mod] of [
     ['hermes-agent', 'run_agent'],

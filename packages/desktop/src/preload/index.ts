@@ -2,6 +2,15 @@ import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('hermesDesktop', {
   getToken: (): Promise<string> => ipcRenderer.invoke('hermes-desktop:get-token'),
+  getSettings: () => ipcRenderer.invoke('hermes-desktop:get-settings'),
+  updateSettings: (patch: Record<string, unknown>) => ipcRenderer.invoke('hermes-desktop:update-settings', patch),
+  checkForUpdates: () => ipcRenderer.invoke('hermes-desktop:check-for-updates'),
+  quit: () => ipcRenderer.invoke('hermes-desktop:quit'),
+  onSettingsChanged: (callback: (settings: unknown) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, settings: unknown) => callback(settings)
+    ipcRenderer.on('hermes-desktop:settings-changed', listener)
+    return () => ipcRenderer.removeListener('hermes-desktop:settings-changed', listener)
+  },
   platform: process.platform,
   isDesktop: true,
 })

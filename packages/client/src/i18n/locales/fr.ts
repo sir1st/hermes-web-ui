@@ -105,6 +105,20 @@ export default {
     expired: 'Expiré',
   },
 
+  desktop: {
+    settings: 'Parametres desktop',
+    launchAtLogin: 'Lancer a la connexion',
+    closeToBackground: 'Fermer en arriere-plan',
+    autoUpdates: 'Mises a jour automatiques',
+    checkForUpdates: 'Verifier les mises a jour',
+    quit: 'Quitter',
+    settingsSaved: 'Parametre desktop enregistre',
+    settingsLoadFailed: 'Echec du chargement des parametres desktop',
+    settingsSaveFailed: 'Echec de l enregistrement du parametre desktop',
+    updateCheckStarted: 'Recherche de mises a jour',
+    updateCheckFailed: 'Echec de la recherche de mises a jour',
+  },
+
   // Gestion de MCP
   mcp: {
     title: 'Serveurs MCP',

@@ -29,40 +29,45 @@ jobs:
             target_os: darwin
             target_arch: arm64
             electron_target: "--mac dmg --arm64"
-            artifact_files: |
+            release_files: |
               packages/desktop/release/*.dmg
               packages/desktop/release/*.dmg.blockmap
+            manifest_artifact: desktop-manifest-darwin-arm64
           - label: macOS x64
             runner: macos-15-intel
             target_os: darwin
             target_arch: x64
             electron_target: "--mac dmg --x64"
-            artifact_files: |
+            release_files: |
               packages/desktop/release/*.dmg
               packages/desktop/release/*.dmg.blockmap
+            manifest_artifact: desktop-manifest-darwin-x64
           - label: Windows x64
             runner: windows-latest
             target_os: win32
             target_arch: x64
             electron_target: "--win nsis --x64"
-            artifact_files: |
+            release_files: |
               packages/desktop/release/*.exe
               packages/desktop/release/*.exe.blockmap
+              packages/desktop/release/latest*.yml
           - label: Linux x64
             runner: ubuntu-22.04
             target_os: linux
             target_arch: x64
             electron_target: "--linux AppImage deb --x64"
-            artifact_files: |
+            release_files: |
               packages/desktop/release/*.AppImage
               packages/desktop/release/*.deb
+              packages/desktop/release/latest*.yml
           - label: Linux arm64
             runner: ubuntu-22.04-arm
             target_os: linux
             target_arch: arm64
             electron_target: "--linux AppImage --arm64"
-            artifact_files: |
+            release_files: |
               packages/desktop/release/*.AppImage
+              packages/desktop/release/latest*.yml
 
     steps:
       - name: Checkout repository
@@ -148,9 +153,53 @@ jobs:
         shell: bash
         run: npm --prefix packages/desktop run dist -- ${{ matrix.electron_target }} ${MAC_BUILD_EXTRA_ARGS:-} --publish never
 
+      - name: Upload macOS updater manifest
+        if: matrix.target_os == 'darwin'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.manifest_artifact }}
+          path: packages/desktop/release/latest*.yml
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Upload artifacts to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.release.tag_name || github.event.inputs.tag }}
           fail_on_unmatched_files: true
-          files: ${{ matrix.artifact_files }}
+          files: ${{ matrix.release_files }}
+
+  mac-updater-manifest:
+    name: macOS updater manifest
+    needs: desktop
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+
+      - name: Download macOS manifests
+        uses: actions/download-artifact@v4
+        with:
+          pattern: desktop-manifest-darwin-*
+          path: packages/desktop/release/manifests
+
+      - name: Merge macOS updater manifest
+        shell: bash
+        run: |
+          mapfile -t manifests < <(find packages/desktop/release/manifests -name 'latest-mac.yml' | sort)
+          if [ "${#manifests[@]}" -ne 2 ]; then
+            printf 'Expected 2 macOS updater manifests, found %s\n' "${#manifests[@]}" >&2
+            printf '%s\n' "${manifests[@]}" >&2
+            exit 1
+          fi
+          node packages/desktop/scripts/merge-mac-latest-yml.mjs "${manifests[0]}" "${manifests[1]}" > packages/desktop/release/latest-mac.yml
+
+      - name: Upload macOS updater manifest to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+          fail_on_unmatched_files: true
+          files: packages/desktop/release/latest-mac.yml

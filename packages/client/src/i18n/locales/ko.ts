@@ -105,6 +105,20 @@ export default {
     expired: '만료됨',
   },
 
+  desktop: {
+    settings: '데스크톱 설정',
+    launchAtLogin: '로그인 시 실행',
+    closeToBackground: '닫을 때 백그라운드로',
+    autoUpdates: '자동 업데이트',
+    checkForUpdates: '업데이트 확인',
+    quit: '종료',
+    settingsSaved: '데스크톱 설정이 저장되었습니다',
+    settingsLoadFailed: '데스크톱 설정을 불러오지 못했습니다',
+    settingsSaveFailed: '데스크톱 설정 저장 실패',
+    updateCheckStarted: '업데이트 확인 중',
+    updateCheckFailed: '업데이트 확인 실패',
+  },
+
   // 사이드바
   // MCP 관리
   mcp: {

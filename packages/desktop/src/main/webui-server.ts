@@ -144,6 +144,30 @@ async function getLoginShellPath(): Promise<string | null> {
   }
 }
 
+function ensureBundledCliAliasBin(home: string, bundledPython: string): { binDir: string; binPath: string } {
+  const binDir = join(home, 'bin')
+  mkdirSync(binDir, { recursive: true })
+
+  if (process.platform === 'win32') {
+    const binPath = join(binDir, 'hermes-studio.cmd')
+    writeFileSync(binPath, [
+      '@echo off',
+      `"${bundledPython}" -m hermes_cli.main %*`,
+      '',
+    ].join('\r\n'), { mode: 0o600 })
+    return { binDir, binPath }
+  }
+
+  const binPath = join(binDir, 'hermes-studio')
+  writeFileSync(binPath, [
+    '#!/bin/sh',
+    `exec "${bundledPython}" -m hermes_cli.main "$@"`,
+    '',
+  ].join('\n'), { mode: 0o755 })
+  chmodSync(binPath, 0o755)
+  return { binDir, binPath }
+}
+
 export function getToken(): string {
   return ensureToken()
 }
@@ -217,8 +241,9 @@ export async function startWebUiServer(port = DEFAULT_PORT): Promise<string> {
   const workerPortBase = await getFreeTcpPortInRange(20000, 59000)
   const loginShellPath = await getLoginShellPath()
   const nvmNodeBinPaths = getNvmNodeBinPaths()
+  const cliAlias = ensureBundledCliAliasBin(home, bundledPython)
   const runtimePath = mergePathEntries(
-    dirname(hermesBin()),
+    cliAlias.binDir,
     loginShellPath,
     nvmNodeBinPaths,
     process.env.PATH,
@@ -232,6 +257,7 @@ export async function startWebUiServer(port = DEFAULT_PORT): Promise<string> {
     NODE_ENV: 'production',
     HERMES_DESKTOP: 'true',
     HERMES_BIN: hermesBin(),
+    HERMES_STUDIO_BIN: cliAlias.binPath,
     HERMES_AGENT_BRIDGE_PYTHON: bundledPython,
     HERMES_AGENT_CLI_PYTHON: existsSync(bundledPythonNoWindow) ? bundledPythonNoWindow : bundledPython,
     HERMES_AGENT_ROOT: pythonDir(),

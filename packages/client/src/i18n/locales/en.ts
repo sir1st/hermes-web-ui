@@ -105,6 +105,20 @@ export default {
     stop: 'Stop',
   },
 
+  desktop: {
+    settings: 'Desktop Settings',
+    launchAtLogin: 'Launch at login',
+    closeToBackground: 'Close to background',
+    autoUpdates: 'Automatic updates',
+    checkForUpdates: 'Check for updates',
+    quit: 'Quit',
+    settingsSaved: 'Desktop setting saved',
+    settingsLoadFailed: 'Failed to load desktop settings',
+    settingsSaveFailed: 'Failed to save desktop setting',
+    updateCheckStarted: 'Checking for updates',
+    updateCheckFailed: 'Failed to check for updates',
+  },
+
   // MCP Management
   mcp: {
     title: 'MCP Servers',

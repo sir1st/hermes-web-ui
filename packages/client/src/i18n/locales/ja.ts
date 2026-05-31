@@ -105,6 +105,20 @@ export default {
     expired: '期限切れ',
   },
 
+  desktop: {
+    settings: 'デスクトップ設定',
+    launchAtLogin: 'ログイン時に起動',
+    closeToBackground: '閉じたらバックグラウンドへ',
+    autoUpdates: '自動更新',
+    checkForUpdates: '更新を確認',
+    quit: '終了',
+    settingsSaved: 'デスクトップ設定を保存しました',
+    settingsLoadFailed: 'デスクトップ設定の読み込みに失敗しました',
+    settingsSaveFailed: 'デスクトップ設定の保存に失敗しました',
+    updateCheckStarted: '更新を確認しています',
+    updateCheckFailed: '更新の確認に失敗しました',
+  },
+
   // サイドバー
   // MCP 管理
   mcp: {

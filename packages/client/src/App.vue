@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n'
 import { getThemeOverrides } from '@/styles/theme'
 import { useTheme } from '@/composables/useTheme'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
+import DesktopTitlebarControls from '@/components/layout/DesktopTitlebarControls.vue'
 import { useKeyboard } from '@/composables/useKeyboard'
 import { useAppStore } from '@/stores/hermes/app'
 import SessionSearchModal from '@/components/hermes/chat/SessionSearchModal.vue'
@@ -23,6 +24,10 @@ const themeOverrides = computed(() => getThemeOverrides(isDark.value, isComic.va
 const naiveTheme = computed(() => isDark.value ? darkTheme : null)
 
 const isLoginPage = computed(() => route.name === 'login')
+const showDesktopTitlebarControls = computed(() => {
+  const desktop = window.hermesDesktop
+  return desktop?.isDesktop === true && desktop.platform !== 'darwin'
+})
 
 const nodeVersionLow = computed(() => {
   const v = appStore.nodeVersion
@@ -63,7 +68,12 @@ useKeyboard()
           <div v-if="nodeVersionLow && ready" class="node-warning-bar">
             {{ t('sidebar.nodeVersionWarning', { version: appStore.nodeVersion }) }}
           </div>
-          <div v-if="ready" class="app-layout" :class="{ 'no-sidebar': isLoginPage }">
+          <DesktopTitlebarControls v-if="ready && showDesktopTitlebarControls" />
+          <div
+            v-if="ready"
+            class="app-layout"
+            :class="{ 'no-sidebar': isLoginPage, 'desktop-titlebar-space': showDesktopTitlebarControls }"
+          >
             <button v-if="!isLoginPage" class="hamburger-btn" @click="appStore.toggleSidebar">
               <img src="/logo.png" alt="Menu" style="width: 24px; height: 24px;" />
             </button>
@@ -92,6 +102,11 @@ useKeyboard()
 
   &.no-sidebar {
     display: block;
+  }
+
+  &.desktop-titlebar-space {
+    height: calc(100 * var(--vh) - 36px);
+    margin-top: 36px;
   }
 }
 
